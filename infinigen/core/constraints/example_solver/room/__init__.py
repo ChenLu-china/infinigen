@@ -3,3 +3,4 @@
 
 # Authors: Lingjie Mei
 from .graph import GraphMaker
+from .dreame_graph import DreameGraphMaker

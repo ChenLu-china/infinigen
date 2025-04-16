@@ -326,6 +326,7 @@ class GraphMaker:
             )
             scores = []
             lengths = np.exp(np.linspace(np.log(1.5), np.log(25), 20))
+            print(lengths)
             for l in lengths:
                 state.objs[name].polygon = shapely.box(0, 0, l, l)
                 state.objs[holder].polygon = shapely.box(-l, -l, 0, 0)
@@ -333,6 +334,7 @@ class GraphMaker:
                 update_exterior(state, name)
                 score, _ = evaluate_problem(consgraph, state)
                 scores.append(score)
+            print(scores)
             scores = np.array(scores)
             selection = (scores - np.min(scores)) < 1
             if np.sum(selection) > len(selection) / 2:

@@ -49,6 +49,8 @@ from infinigen.core.util.math import FixedSeed, int_hash
 from infinigen.core.util.random import log_uniform
 from infinigen.core.util.random import random_general as rg
 
+from infinigen.abo_assets.objects.seating.chairs import random_chair_factory
+
 logger = logging.getLogger(__name__)
 
 
@@ -647,3 +649,29 @@ def room_pillars(walls: list[bpy.types.Object], constants: RoomConstants):
             )
             butil.put_in_collection(obj, col)
         butil.delete(interior)
+
+
+@gin.configurable
+def test_abo_decorate(    
+    placeholders: list[bpy.types.Object],
+    constants: RoomConstants,
+    n_chairs=1,
+    door_chance=1,
+    casing_chance=0.0,
+    all_open=False
+):
+    import json
+    from pathlib import Path
+
+    meta_path = Path("/home/chenlu/ezone/infinigen/data/meshes/chair/meta_data.json")
+    meta_infos = json.load(open(meta_path, "r"))
+    
+    item_ids = [meta["item_id"] for meta in meta_infos]
+
+    test_item_id = "B075YMXWZM"
+
+    chair_factory = [
+        random_chair_factory()(test_item_id, constants=constants)
+        for _ in range(n_chairs)
+    ]
+    pass

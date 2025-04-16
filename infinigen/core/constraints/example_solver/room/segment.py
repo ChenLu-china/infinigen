@@ -239,11 +239,20 @@ class SegmentMaker:
             )
             n = np.random.choice(candidates, p=prob / prob.sum())
             self.merge_segment(segments, shared_edges, attached, k, n)
+        self.plot(segments)
         return segments, shared_edges
 
     def plot(self, segments):
+        from pathlib import Path
         plt.clf()
         for k, s in segments.items():
             shapely.plotting.plot_polygon(s, color=uniform(0, 1, 3))
         plt.tight_layout()
+
+        # output
+        output_dir = Path("./floor_plan_debug")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"floorplan_segments_{np.random.randint(0, 10000)}.png"
+        plt.savefig(output_dir / filename)
+        print(f"Saved to {output_dir / filename}")
         plt.show()

@@ -162,18 +162,74 @@ class FloorPlanMoves:
             return names
         return set()
 
+    # @staticmethod
+    # def plot(state):
+    #     plt.clf()
+    #     _, axes = plt.subplots(1, len(state.graphs))
+    #     centroids = {}
+    #     for k, o in valid_rooms(state):
+    #         i = room_level(k)
+    #         plot_geometry(axes[i], o.polygon, np.random.uniform(0, 1, 3))
+    #         centroids[k] = o.polygon.centroid
+    #     for i, g in enumerate(state.graphs):
+    #         for k, ns in g.valid_neighbours.items():
+    #             for n in ns:
+    #                 if k < n:
+    #                     axes[i].plot(centroids[k], centroids[n], "k-")
+    #     plt.show()
+    
     @staticmethod
     def plot(state):
         plt.clf()
-        _, axes = plt.subplots(1, len(state.graphs))
+        fig, axes = plt.subplots(1, max(1, len(state.graphs)), figsize=(15, 10))
+        
+        # 确保 axes 总是可迭代的，即使只有一个子图
+        if not isinstance(axes, np.ndarray):
+            axes = np.array([axes])
+            
         centroids = {}
         for k, o in valid_rooms(state):
             i = room_level(k)
-            plot_geometry(axes[i], o.polygon, np.random.uniform(0, 1, 3))
-            centroids[k] = o.polygon.centroid
+            if i < len(axes):  # 确保不会超出索引范围
+                plot_geometry(axes[i], o.polygon, np.random.uniform(0, 1, 3))
+                centroids[k] = o.polygon.centroid
+                
+                # 添加房间名称标签
+                try:
+                    room_label = str(room_type(k)).replace("Semantics.", "")
+                    axes[i].text(
+                        centroids[k].x, centroids[k].y, 
+                        room_label, 
+                        fontsize=9,
+                        ha='center', va='center',
+                        bbox=dict(facecolor='white', alpha=0.7, edgecolor='none', pad=3)
+                    )
+                except:
+                    pass
+                    
         for i, g in enumerate(state.graphs):
-            for k, ns in g.valid_neighbours.items():
-                for n in ns:
-                    if k < n:
-                        axes[i].plot(centroids[k], centroids[n], "k-")
-        plt.show()
+            if i < len(axes):  # 确保不会超出索引范围
+                for k, ns in g.valid_neighbours.items():
+                    for n in ns:
+                        if k < n and k in centroids and n in centroids:
+                            axes[i].plot(
+                                [centroids[k].x, centroids[n].x],
+                                [centroids[k].y, centroids[n].y], 
+                                "k-", alpha=0.5)
+        
+        # 保存图像
+        from pathlib import Path
+        output_dir = Path("./floor_plan_debug")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"floorplan_layout_{np.random.randint(0, 10000)}.png"
+        plt.savefig(output_dir / filename)
+        print(f"Saved layout plot to {output_dir / filename}")
+        
+        # 尝试显示（在无图形界面环境中可能失败）
+        try:
+            plt.tight_layout()
+            plt.show()
+        except Exception as e:
+            print(f"Could not display plot: {e}")
+        finally:
+            plt.close(fig)  # 确保关闭图形释放内存

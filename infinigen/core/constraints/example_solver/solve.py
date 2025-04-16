@@ -26,7 +26,7 @@ from infinigen.core.util import blender as butil
 
 from .annealing import SimulatedAnnealingSolver
 from .room.floor_plan import FloorPlanSolver
-
+from .room.dreame_floor_plan import DreameFloorPlanSolver
 logger = logging.getLogger(__name__)
 
 
@@ -79,6 +79,7 @@ class Solver:
             output_folder=output_folder,
         )
         self.room_solver_fn = FloorPlanSolver
+        self.dreame_solver_fn = DreameFloorPlanSolver
         self.state: State = None
         self.dimensions = None
 
@@ -132,7 +133,8 @@ class Solver:
         return np.random.choice(funcs, p=weights / weights.sum())
 
     def solve_rooms(self, scene_seed, consgraph: "cl.Problem", filter: "r.Domain"):
-        self.state, _, _ = self.room_solver_fn(scene_seed, consgraph).solve()
+        self.state, _, _ = self.dreame_solver_fn(scene_seed, consgraph).solve()
+        # self.state, _, _ = self.room_solver_fn(scene_seed, consgraph).solve()
         return self.state
 
     @gin.configurable

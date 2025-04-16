@@ -129,7 +129,8 @@ class FloorPlanSolver:
                         break
                 else:
                     break
-
+    
+        # self.segment_makers[0].plot(states[0].objs)
         state = self.simulated_anneal(state)
         self.contour_factory.decorate(state)
 
@@ -166,4 +167,5 @@ class FloorPlanSolver:
                     score = score_
                 pbar.update(1)
                 pbar.set_postfix(score=score)
+        self.solver.plot(state)
         return state
